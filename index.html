@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LushLyrics – Synced Lyrics for Spotify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="LushLyrics is an Android app that shows synced lyrics for your Spotify music, with playlist and queue support."
+  />
+  <style>
+    :root {
+      --bg: #050608;
+      --card: #11141b;
+      --accent: #ff4b8b;
+      --accent-soft: rgba(255, 75, 139, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-soft: rgba(156, 163, 175, 0.25);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --shadow-soft: 0 18px 35px rgba(0, 0, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Roboto", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #050608 60%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      max-width: 960px;
+      width: 100%;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1f2937 0, #050608 60%);
+      border-radius: var(--radius-xl);
+      padding: 28px 22px 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-soft);
+      backdrop-filter: blur(18px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(26px, 3.2vw, 32px);
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(156, 163, 175, 0.35);
+      margin-bottom: 18px;
+    }
+
+    .pill span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #1db954;
+      box-shadow: 0 0 8px rgba(29, 185, 84, 0.9);
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: transform 0.14s ease, box-shadow 0.14s ease,
+        background 0.14s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff4b8b, #ff8c4b);
+      color: #fff;
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.55);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary small,
+    .btn-ghost small {
+      opacity: 0.75;
+      font-size: 11px;
+    }
+
+    .meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .meta span {
+      opacity: 0.75;
+    }
+
+    .meta strong {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .meta-divider {
+      margin: 0 6px;
+      opacity: 0.4;
+    }
+
+    .right {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top, #111827 0, #020617 65%);
+      border: 1px solid rgba(31, 41, 55, 0.85);
+      padding: 16px 16px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .right::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at 10% -10%,
+        rgba(255, 75, 139, 0.32),
+        transparent 55%
+      );
+      pointer-events: none;
+    }
+
+    .phone-frame {
+      border-radius: 22px;
+      border: 1px solid rgba(156, 163, 175, 0.35);
+      padding: 10px;
+      background: radial-gradient(circle at top, #020617 0, #020617 60%);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.85);
+    }
+
+    .phone-screen {
+      border-radius: 16px;
+      background: linear-gradient(180deg, #020617 0, #020617 30%, #020617 100%);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      overflow: hidden;
+      padding: 10px 10px 12px;
+      position: relative;
+    }
+
+    .phone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .phone-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .album-card {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .album-art {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: conic-gradient(
+        from 140deg,
+        #ff4b8b,
+        #ff8c4b,
+        #facc15,
+        #22c55e,
+        #3b82f6,
+        #ff4b8b
+      );
+    }
+
+    .album-info-title {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .album-info-artist {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .lyrics-block {
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      padding: 9px;
+      font-size: 10px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .lyrics-line {
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .lyrics-line.current {
+      color: #f9fafb;
+      font-weight: 600;
+    }
+
+    .lyrics-line.current span.highlight {
+      color: var(--accent);
+    }
+
+    .progress-bar {
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 0.9);
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-fill {
+      width: 48%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff4b8b, #ff8c4b);
+    }
+
+    .phone-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .pill-small {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      font-size: 9px;
+      color: #e5e7eb;
+    }
+
+    footer {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="card">
+      <div>
+        <div class="badge">
+          <span class="badge-dot"></span>
+          <span>Android lyrics companion</span>
+        </div>
+
+        <h1>LushLyrics</h1>
+        <p class="subtitle">
+          LushLyrics is an Android app that shows synced lyrics for the music
+          you play on Spotify. See lines and words highlight in real time,
+          browse your playlists, and keep a floating lyrics overlay on top of
+          any app.
+        </p>
+
+        <div class="pill">
+          <span class="dot"></span>
+          <span>Works with your existing Spotify account</span>
+        </div>
+
+        <div class="buttons">
+          <a class="btn-primary" href="#download">
+            <span>Coming soon on Google Play</span>
+            <small>Follow the project on GitHub in the meantime</small>
+          </a>
+          <a
+            class="btn-ghost"
+            href="https://github.com/AndreNijman"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>View source on GitHub</span>
+          </a>
+        </div>
+
+        <p class="meta">
+          <span>Features:</span>
+          <span class="meta-divider">•</span>
+          <strong>Synced lyrics</strong>
+          <span class="meta-divider">•</span>
+          <strong>Playlist &amp; queue view</strong>
+          <span class="meta-divider">•</span>
+          <strong>Floating lyrics overlay</strong>
+        </p>
+      </div>
+
+      <div class="right">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <span class="phone-title">Now playing</span>
+              <span>Spotify · LushLyrics</span>
+            </div>
+
+            <div class="album-card">
+              <div class="album-art"></div>
+              <div>
+                <div class="album-info-title">Midnight Echoes</div>
+                <div class="album-info-artist">Neon District</div>
+              </div>
+            </div>
+
+            <div class="lyrics-block">
+              <div class="lyrics-line">City lights are fading in the rear-view</div>
+              <div class="lyrics-line current">
+                We <span class="highlight">fall</span> in sync with every line
+              </div>
+              <div class="lyrics-line">
+                Every beat is drawing out the truth
+              </div>
+              <div class="lyrics-line">
+                Singing through the static of the night
+              </div>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+
+            <div class="phone-footer">
+              <span>01:28 / 03:12</span>
+              <span class="pill-small">Live lyrics</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer id="download">
+      <p>
+        LushLyrics uses the official Spotify Web API for authentication and
+        playback data. It is not affiliated with or endorsed by Spotify AB.
+      </p>
+      <p>
+        Privacy policy:
+        <a href="https://example.com/privacy" target="_blank" rel="noreferrer">
+          link
+        </a>
+        (replace with your real URL)
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
